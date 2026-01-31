@@ -1,0 +1,30 @@
+{
+  "name": "@loop/models",
+  "version": "1.0.0",
+  "description": "A collection of data models shared across the project",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist/**"
+  ],
+  "scripts": {
+    "build": "tsup --dts",
+    "dev": "tsup --dts"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "eslint": "9.39.2",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3"
+  }
+}
