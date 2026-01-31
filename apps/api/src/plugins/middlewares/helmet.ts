@@ -1,5 +1,5 @@
 import helmet, { FastifyHelmetOptions } from '@fastify/helmet';
-import { Config } from '@/config.ts';
+import { Config } from '@/config';
 
 export const autoConfig: FastifyHelmetOptions = {
   contentSecurityPolicy:

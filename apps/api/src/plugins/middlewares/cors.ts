@@ -1,5 +1,5 @@
 import cors, { FastifyCorsOptions } from '@fastify/cors';
-import { Config } from '@/config.ts';
+import { Config } from '@/config';
 
 export const autoConfig: FastifyCorsOptions = {
   origin: JSON.parse(Config.env.CORS_ORIGINS ?? '["*"]'),

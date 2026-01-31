@@ -1,6 +1,9 @@
-import { Config } from './config.ts';
+import { Config } from './config';
+import { Server } from './server';
 
-const { Server } = await import('./server.ts');
+async function startSystem() {
+  Config.init();
+  await Server.start();
+}
 
-Config.init();
-await Server.start();
+startSystem();

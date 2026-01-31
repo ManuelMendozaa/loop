@@ -1,7 +1,7 @@
 import path from 'path';
 import Fastify from 'fastify';
 import fastifyAutoload from '@fastify/autoload';
-import { Config } from './config.ts';
+import { Config } from './config';
 
 const __dirname = `${path.resolve()}/src`;
 
