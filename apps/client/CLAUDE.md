@@ -22,3 +22,4 @@ UI for @loop. Optimize for correctness + maintainability. Tests are the source o
 - React Components with display responsibility (JSX code) must have as little logic as possible.
 - JSX code must have as little logic as possible in it.
 - Contexts, utils and libs must exists in their specific module folders unless they are broadly used.
+- HTTP calls must be made with the ./src/libs/api implementation
