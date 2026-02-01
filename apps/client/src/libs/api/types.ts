@@ -1,20 +1,25 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { z } from 'zod';
 import { UseQueryOptions } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 
-export type TFetchInput<DataType> = {
+export type FetchError = AxiosError;
+
+export type FetchInput<DataType> = {
   url: string;
   schema?: z.ZodType<DataType>;
   options?: RequestInit;
 };
 
-export type TFetchOutput<DataType> = {
+export type FetchOutput<DataType> = {
   response: Response;
-  data: DataType;
+  data: DataType | null;
 };
 
-export type QueryOptions<DataType> = UseQueryOptions<
-  any,
-  any,
-  TFetchOutput<DataType>,
+export type QueryOptions<InputType, OutputType> = UseQueryOptions<
+  InputType,
+  FetchError,
+  FetchOutput<OutputType>,
   any
 >;

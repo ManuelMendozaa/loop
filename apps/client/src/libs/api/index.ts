@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { TFetchInput } from './types';
+import { FetchInput } from './types';
 import { fetchWrapper } from './fetch';
 import { getFetchHeaders } from './headers';
 
@@ -8,7 +8,7 @@ export const api = {
     url,
     schema = z.any() as z.ZodType<DataType>,
     options = {},
-  }: TFetchInput<DataType>) =>
+  }: FetchInput<DataType>) =>
     fetchWrapper({
       url,
       schema,
@@ -23,7 +23,7 @@ export const api = {
     url,
     schema = z.any() as z.ZodType<DataType>,
     options = {},
-  }: TFetchInput<DataType>) =>
+  }: FetchInput<DataType>) =>
     fetchWrapper({
       url,
       schema,
@@ -41,7 +41,7 @@ export const api = {
     url,
     schema = z.any() as z.ZodType<DataType>,
     options = {},
-  }: TFetchInput<DataType>) =>
+  }: FetchInput<DataType>) =>
     fetchWrapper({
       url,
       schema,
@@ -59,7 +59,7 @@ export const api = {
     url,
     schema = z.any() as z.ZodType<DataType>,
     options = {},
-  }: TFetchInput<DataType>) =>
+  }: FetchInput<DataType>) =>
     fetchWrapper({
       url,
       schema,
@@ -75,3 +75,4 @@ export const api = {
 };
 
 export * from './types';
+export * from './hooks';

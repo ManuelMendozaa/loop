@@ -1,11 +1,11 @@
 import { z } from 'zod';
-import { TFetchInput, TFetchOutput } from './types';
+import { FetchInput, FetchOutput } from './types';
 
 export const fetchWrapper = async <DataType>({
   url: _url,
   schema = z.any() as z.ZodType<DataType>,
   options = {},
-}: TFetchInput<DataType>): Promise<TFetchOutput<DataType | null>> => {
+}: FetchInput<DataType>): Promise<FetchOutput<DataType>> => {
   const url = `${process.env.NEXT_PUBLIC_API_URL}${_url}`;
 
   if (options.body && typeof options.body !== 'string') {
