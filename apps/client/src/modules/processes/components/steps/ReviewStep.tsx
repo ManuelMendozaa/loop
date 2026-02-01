@@ -1,18 +1,16 @@
 import { Leaf, Variable, Package, FileText, StickyNote } from 'lucide-react';
 
 import {
-  DURATION_UNIT_LABELS,
-  DurationUnit,
   STEP_TYPE_LABELS,
-  StepType,
   OutputVariable,
   OutputVariableType,
 } from '../../types/process';
 import {
-  SelectedIngredient,
   METRIC_UNIT_ABBREVIATIONS,
   METRIC_UNIT_LABELS,
 } from '@/src/modules/ingredients/types';
+import { durationUnits } from '@/src/utils/time';
+import { useStep } from '../../hooks/useStep';
 
 function getVariableIcon(type: OutputVariableType) {
   switch (type) {
@@ -61,28 +59,16 @@ function ReviewSection({ title, icon, children }: ReviewSectionProps) {
   );
 }
 
-export function ReviewStep({
-  type,
-  name,
-  description,
-  duration,
-  durationUnit,
-  assignee,
-  notes,
-  ingredients,
-  outputVariables,
-}: {
-  type: StepType;
-  name: string;
-  description: string;
-  duration: string;
-  durationUnit: DurationUnit;
-  assignee: string;
-  notes: string;
-  ingredients: SelectedIngredient[];
-  outputVariables: OutputVariable[];
-}) {
-  const validVariables = outputVariables.filter(isValidVariable);
+export function ReviewStep() {
+  const { step } = useStep();
+
+  if (!step?.type) {
+    return (
+      <p className="text-sm text-muted-foreground">No step data available.</p>
+    );
+  }
+
+  const validVariables = step?.outputVariables?.filter(isValidVariable);
 
   return (
     <div className="grid grid-cols-2 gap-6">
@@ -93,44 +79,46 @@ export function ReviewStep({
           <div className="grid gap-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Type</span>
-              <span className="font-medium">{STEP_TYPE_LABELS[type]}</span>
+              <span className="font-medium">
+                {STEP_TYPE_LABELS[step?.type]}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Name</span>
-              <span className="font-medium">{name || '—'}</span>
+              <span className="font-medium">{step?.name || '—'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Duration</span>
               <span className="font-medium">
-                {duration
-                  ? `${duration} ${DURATION_UNIT_LABELS[durationUnit].toLowerCase()}`
+                {step?.estimatedDuration
+                  ? `${step.estimatedDuration} ${durationUnits.find((unit) => unit.value === step.durationUnit)?.label.toLowerCase()}`
                   : '—'}
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Assignee</span>
-              <span className="font-medium">{assignee || '—'}</span>
+              <span className="font-medium">{step?.assignee || '—'}</span>
             </div>
           </div>
         </div>
 
         {/* Description */}
-        {description && (
+        {step?.description && (
           <ReviewSection
             title="Description"
             icon={<FileText className="text-muted-foreground size-4" />}
           >
-            <p className="text-muted-foreground text-sm">{description}</p>
+            <p className="text-muted-foreground text-sm">{step.description}</p>
           </ReviewSection>
         )}
 
         {/* Notes */}
-        {notes && (
+        {step?.notes && (
           <ReviewSection
             title="Notes"
             icon={<StickyNote className="text-muted-foreground size-4" />}
           >
-            <p className="text-muted-foreground text-sm">{notes}</p>
+            <p className="text-muted-foreground text-sm">{step.notes}</p>
           </ReviewSection>
         )}
       </div>
@@ -142,9 +130,9 @@ export function ReviewStep({
           title="Ingredients"
           icon={<Leaf className="text-muted-foreground size-4" />}
         >
-          {ingredients.length > 0 ? (
+          {(step?.ingredients?.length ?? 0) > 0 ? (
             <div className="space-y-2">
-              {ingredients.map((selected) => (
+              {step.ingredients!.map((selected) => (
                 <div
                   key={selected.ingredientId}
                   className="bg-muted/50 flex items-center gap-2 rounded-md px-3 py-2"
@@ -160,7 +148,9 @@ export function ReviewStep({
               ))}
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">No ingredients added</p>
+            <p className="text-muted-foreground text-sm">
+              No ingredients added
+            </p>
           )}
         </ReviewSection>
 
@@ -169,9 +159,9 @@ export function ReviewStep({
           title="Output Variables"
           icon={<Variable className="text-muted-foreground size-4" />}
         >
-          {validVariables.length > 0 ? (
+          {(validVariables?.length ?? 0) > 0 ? (
             <div className="space-y-2">
-              {validVariables.map((variable) => {
+              {validVariables!.map((variable) => {
                 const Icon = getVariableIcon(variable.type);
                 return (
                   <div
@@ -190,7 +180,9 @@ export function ReviewStep({
               })}
             </div>
           ) : (
-            <p className="text-muted-foreground text-sm">No output variables defined</p>
+            <p className="text-muted-foreground text-sm">
+              No output variables defined
+            </p>
           )}
         </ReviewSection>
       </div>

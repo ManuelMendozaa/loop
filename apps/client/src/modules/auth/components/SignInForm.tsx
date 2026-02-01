@@ -12,18 +12,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/common/Card';
-import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from '@/src/common/Field';
+import { Field, FieldError, FieldGroup, FieldLabel } from '@/src/common/Field';
 
 interface SignInFormProps {
   onSubmit?: (data: { email: string; password: string }) => Promise<void>;
 }
 
-function SignInForm({ onSubmit }: SignInFormProps) {
+export function SignInForm({ onSubmit }: SignInFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +86,3 @@ function SignInForm({ onSubmit }: SignInFormProps) {
     </Card>
   );
 }
-
-export { SignInForm };
-export type { SignInFormProps };

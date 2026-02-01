@@ -14,14 +14,10 @@ import {
 } from '@/src/common/Dialog';
 import {
   ProcessStep,
-  StepType,
-  DurationUnit,
-  ExecutionType,
   MODAL_STEPS,
   ModalStep,
   OutputVariable,
 } from '../../types/process';
-import { SelectedIngredient } from '@/src/modules/ingredients/types';
 import { StepIndicator } from './components/StepIndicator';
 import { TypeStep } from './components/TypeStep';
 import { DetailsStep } from './DetailsStep';
@@ -29,12 +25,15 @@ import { TimingStep } from './TimingStep';
 import { VariablesStep } from './VariablesStep';
 import { ReviewStep } from './ReviewStep';
 import { DUMMY_PRODUCTS } from '@/src/modules/products/utils/dummy';
+import { Provider } from '@/src/modules/providers/types';
+import { useStep } from '../../hooks/useStep';
 
 interface AddStepModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSubmit: (step: Omit<ProcessStep, 'id' | 'order'>) => void;
   step?: ProcessStep;
+  providers: Provider[];
 }
 
 const getStepTitles = (): Record<ModalStep, string> => ({
@@ -58,40 +57,18 @@ export function AddStepModal({
   onOpenChange,
   onSubmit,
   step,
+  providers,
 }: AddStepModalProps) {
   const isEditing = !!step;
+  const { step: contextStep, setStep: setContextStep } = useStep();
 
   const [currentStep, setCurrentStep] = useState<ModalStep>('type');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Form state
-  const [type, setType] = useState<StepType | null>(null);
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [notes, setNotes] = useState('');
-  const [duration, setDuration] = useState('');
-  const [durationUnit, setDurationUnit] = useState<DurationUnit>('hours');
-  const [assignee, setAssignee] = useState('');
-  const [ingredients, setIngredients] = useState<SelectedIngredient[]>([]);
-  const [outputVariables, setOutputVariables] = useState<OutputVariable[]>([]);
-  const [providerIds, setProviderIds] = useState<string[]>([]);
-  const [executionType, setExecutionType] = useState<ExecutionType>('batch');
-
   // Populate form when editing
   useEffect(() => {
     if (step && open) {
-      // eslint-disable-next-line
-      setType(step.type);
-      setName(step.name);
-      setDescription(step.description);
-      setNotes(step.notes || '');
-      setDuration(step.estimatedDuration?.toString() || '');
-      setDurationUnit(step.durationUnit || 'hours');
-      setAssignee(step.assignee || '');
-      setIngredients(step.ingredients || []);
-      setOutputVariables(step.outputVariables || []);
-      setProviderIds(step.providerIds || []);
-      setExecutionType(step.executionType || 'batch');
+      setContextStep(step);
     }
   }, [step, open]);
 
@@ -105,9 +82,12 @@ export function AddStepModal({
   const canProceed = () => {
     switch (currentStep) {
       case 'type':
-        return type !== null;
+        return contextStep?.type !== null && contextStep?.type !== undefined;
       case 'details':
-        return name.trim() !== '' && description.trim() !== '';
+        return (
+          contextStep?.name?.trim() !== '' &&
+          contextStep?.description?.trim() !== ''
+        );
       case 'timing':
         return true; // Optional fields
       case 'variables':
@@ -145,27 +125,33 @@ export function AddStepModal({
   };
 
   const handleSubmit = async () => {
-    if (!type) return;
+    if (!contextStep) return;
 
     setIsSubmitting(true);
 
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    const validVariables = filterValidVariables(outputVariables);
+    const validVariables = filterValidVariables(
+      contextStep?.outputVariables ?? []
+    );
+    const totalIngredients = contextStep.ingredients?.length ?? 0;
+    const totalProviders = contextStep.providerIds?.length ?? 0;
 
     onSubmit({
-      type,
-      name,
-      description,
-      notes: notes || undefined,
-      estimatedDuration: duration ? parseInt(duration, 10) : undefined,
-      durationUnit: duration ? durationUnit : undefined,
-      assignee: assignee || undefined,
-      ingredients: ingredients.length > 0 ? ingredients : undefined,
+      type: contextStep.type!,
+      name: contextStep.name!,
+      description: contextStep.description!,
+      notes: contextStep.notes || undefined,
+      estimatedDuration: contextStep.estimatedDuration,
+      durationUnit: contextStep.durationUnit
+        ? contextStep.durationUnit
+        : undefined,
+      assignee: contextStep.assignee || undefined,
+      ingredients: totalIngredients > 0 ? contextStep.ingredients : undefined,
       outputVariables: validVariables.length > 0 ? validVariables : undefined,
-      providerIds: providerIds.length > 0 ? providerIds : undefined,
-      executionType,
+      providerIds: totalProviders > 0 ? contextStep.providerIds : undefined,
+      executionType: contextStep.executionType!,
     });
 
     // Reset form
@@ -176,17 +162,19 @@ export function AddStepModal({
 
   const resetForm = () => {
     setCurrentStep('type');
-    setType(null);
-    setName('');
-    setDescription('');
-    setNotes('');
-    setDuration('');
-    setDurationUnit('hours');
-    setAssignee('');
-    setIngredients([]);
-    setOutputVariables([]);
-    setProviderIds([]);
-    setExecutionType('batch');
+    setContextStep({
+      type: undefined,
+      name: '',
+      description: '',
+      notes: '',
+      assignee: '',
+      ingredients: [],
+      outputVariables: [],
+      providerIds: [],
+      executionType: undefined,
+      estimatedDuration: undefined,
+      durationUnit: undefined,
+    });
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -215,57 +203,15 @@ export function AddStepModal({
         </DialogHeader>
 
         <div className="py-4">
-          {currentStep === 'type' && (
-            <TypeStep value={type} onChange={setType} />
-          )}
-          {currentStep === 'details' && (
-            <DetailsStep
-              stepType={type}
-              name={name}
-              description={description}
-              notes={notes}
-              ingredients={ingredients}
-              providerIds={providerIds}
-              executionType={executionType}
-              onExecutionTypeChange={setExecutionType}
-              onNameChange={setName}
-              onDescriptionChange={setDescription}
-              onNotesChange={setNotes}
-              onIngredientsChange={setIngredients}
-              onProvidersChange={setProviderIds}
-            />
-          )}
-          {currentStep === 'timing' && (
-            <TimingStep
-              duration={duration}
-              durationUnit={durationUnit}
-              assignee={assignee}
-              executionType={executionType}
-              onDurationChange={setDuration}
-              onDurationUnitChange={setDurationUnit}
-              onAssigneeChange={setAssignee}
-            />
-          )}
-          {currentStep === 'variables' && (
-            <VariablesStep
-              products={DUMMY_PRODUCTS}
-              variables={outputVariables}
-              onVariablesChange={setOutputVariables}
-            />
-          )}
-          {currentStep === 'review' && type && (
-            <ReviewStep
-              type={type}
-              name={name}
-              description={description}
-              duration={duration}
-              durationUnit={durationUnit}
-              assignee={assignee}
-              notes={notes}
-              ingredients={ingredients}
-              outputVariables={outputVariables}
-            />
-          )}
+          {currentStep === 'type' ? <TypeStep /> : null}
+          {currentStep === 'details' ? (
+            <DetailsStep providers={providers} />
+          ) : null}
+          {currentStep === 'timing' ? <TimingStep /> : null}
+          {currentStep === 'variables' ? (
+            <VariablesStep products={DUMMY_PRODUCTS} />
+          ) : null}
+          {currentStep === 'review' ? <ReviewStep /> : null}
         </div>
 
         <DialogFooter>

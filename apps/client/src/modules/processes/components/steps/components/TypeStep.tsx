@@ -1,42 +1,24 @@
 'use client';
 
-import {
-  ChefHat,
-  Factory,
-  ClipboardCheck,
-  Package,
-  Truck,
-  Settings,
-  LucideIcon,
-} from 'lucide-react';
-import { StepType, STEP_TYPES } from '../../../types/process';
+import { STEP_TYPES } from '../../../types/process';
+import { useStep } from '../../../hooks/useStep';
 
-interface TypeStepProps {
-  value: StepType | null;
-  onChange: (type: StepType) => void;
-}
+export function TypeStep() {
+  const { step, setStep } = useStep();
 
-const STEP_TYPE_ICONS: Record<StepType, LucideIcon> = {
-  preparation: ChefHat,
-  production: Factory,
-  quality_check: ClipboardCheck,
-  packaging: Package,
-  shipping: Truck,
-  custom: Settings,
-};
-
-export function TypeStep({ value, onChange }: TypeStepProps) {
   return (
     <div className="grid grid-cols-2 gap-3">
       {STEP_TYPES.map((type) => {
-        const Icon = STEP_TYPE_ICONS[type.value];
+        const Icon = type.icon;
         return (
           <button
             key={type.value}
             type="button"
-            onClick={() => onChange(type.value)}
+            onClick={() => {
+              setStep((prev) => ({ ...prev, type: type.value }));
+            }}
             className={`rounded-lg border p-4 text-left transition-colors ${
-              value === type.value
+              step?.type === type.value
                 ? 'border-primary bg-primary/5'
                 : 'hover:border-primary/50 hover:bg-muted/50'
             }`}
@@ -44,7 +26,7 @@ export function TypeStep({ value, onChange }: TypeStepProps) {
             <div className="flex items-start gap-3">
               <div
                 className={`flex size-10 shrink-0 items-center justify-center rounded-lg ${
-                  value === type.value
+                  step?.type === type.value
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground'
                 }`}

@@ -23,15 +23,18 @@ import { Card, CardContent } from '@/src/common/Card';
 import { Badge } from '@/src/common/Badge';
 import {
   ProcessStep,
-  StepType,
+  StepTypeEnum,
   STEP_TYPE_LABELS,
   DURATION_UNIT_LABELS,
   OutputVariable,
 } from '../../types/process';
-import { METRIC_UNIT_ABBREVIATIONS, METRIC_UNIT_LABELS } from '@/src/modules/ingredients/types';
+import {
+  METRIC_UNIT_ABBREVIATIONS,
+  METRIC_UNIT_LABELS,
+} from '@/src/modules/ingredients/types';
 import { DUMMY_PROVIDERS } from '@/src/modules/providers/types';
 
-const STEP_TYPE_ICONS: Record<StepType, LucideIcon> = {
+const STEP_TYPE_ICONS: Record<StepTypeEnum, LucideIcon> = {
   preparation: ChefHat,
   production: Factory,
   quality_check: ClipboardCheck,
@@ -58,12 +61,17 @@ interface ProcessStepCardProps {
   onDelete: (id: string) => void;
 }
 
-function ProcessStepCard({ step, stepNumber, onEdit, onDelete }: ProcessStepCardProps) {
+export function ProcessStepCard({
+  step,
+  stepNumber,
+  onEdit,
+  onDelete,
+}: ProcessStepCardProps) {
   const StepIcon = STEP_TYPE_ICONS[step.type];
 
   return (
     <Card className="group relative">
-      <CardContent className="flex gap-4 p-4">
+      <CardContent className="flex gap-4 px-4 py-1">
         <div className="text-muted-foreground flex cursor-grab items-center">
           <GripVertical className="size-5" />
         </div>
@@ -138,7 +146,8 @@ function ProcessStepCard({ step, stepNumber, onEdit, onDelete }: ProcessStepCard
                   key={variable.id}
                   className="bg-primary/10 text-primary rounded px-2 py-0.5 text-xs"
                 >
-                  {getVariableDisplayName(variable)} ({METRIC_UNIT_LABELS[variable.unit]})
+                  {getVariableDisplayName(variable)} (
+                  {METRIC_UNIT_LABELS[variable.unit]})
                 </span>
               ))}
             </div>
@@ -146,7 +155,9 @@ function ProcessStepCard({ step, stepNumber, onEdit, onDelete }: ProcessStepCard
           {step.providerIds && step.providerIds.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1">
               {step.providerIds.map((providerId) => {
-                const provider = DUMMY_PROVIDERS.find((p) => p.id === providerId);
+                const provider = DUMMY_PROVIDERS.find(
+                  (p) => p.id === providerId
+                );
                 return provider ? (
                   <span
                     key={providerId}
@@ -166,11 +177,7 @@ function ProcessStepCard({ step, stepNumber, onEdit, onDelete }: ProcessStepCard
         </div>
         <div className="flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
           {onEdit && (
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => onEdit(step)}
-            >
+            <Button variant="ghost" size="icon-sm" onClick={() => onEdit(step)}>
               <Pencil className="size-4" />
             </Button>
           )}
@@ -187,6 +194,3 @@ function ProcessStepCard({ step, stepNumber, onEdit, onDelete }: ProcessStepCard
     </Card>
   );
 }
-
-export { ProcessStepCard, STEP_TYPE_ICONS };
-export type { ProcessStepCardProps };

@@ -7,38 +7,21 @@ import {
   FieldGroup,
   FieldLabel,
 } from '@/src/common/Field';
-import {
-  DurationUnit,
-  ExecutionType,
-  DURATION_UNIT_LABELS,
-  DURATION_UNITS,
-} from '../../types/process';
+import { durationUnits } from '@/src/utils/time';
+import { useStep } from '../../hooks/useStep';
 
-interface TimingStepProps {
-  duration: string;
-  durationUnit: DurationUnit;
-  assignee: string;
-  executionType: ExecutionType;
-  onDurationChange: (value: string) => void;
-  onDurationUnitChange: (value: DurationUnit) => void;
-  onAssigneeChange: (value: string) => void;
-}
+export function TimingStep() {
+  const { step, setStep } = useStep();
 
-export function TimingStep({
-  duration,
-  durationUnit,
-  assignee,
-  executionType,
-  onDurationChange,
-  onDurationUnitChange,
-  onAssigneeChange,
-}: TimingStepProps) {
-  const durationLabel =
-    executionType === 'batch' ? 'Total Duration' : 'Duration per Iteration';
-  const durationDescription =
-    executionType === 'batch'
-      ? 'Total time to complete the entire batch'
-      : 'Time required for each iteration cycle';
+  const isBatchStep = step?.executionType === 'batch';
+
+  const durationLabel = isBatchStep
+    ? 'Total Duration'
+    : 'Duration per Iteration';
+
+  const durationDescription = isBatchStep
+    ? 'Total time to complete the entire batch'
+    : 'Time required for each iteration cycle';
 
   return (
     <FieldGroup>
@@ -49,23 +32,25 @@ export function TimingStep({
             type="number"
             min="0"
             placeholder="Duration"
-            value={duration}
-            onChange={(e) => onDurationChange(e.target.value)}
+            value={step?.estimatedDuration ?? ''}
+            onChange={(e) =>
+              setStep({ ...step, estimatedDuration: Number(e.target.value) })
+            }
             className="flex-1"
           />
           <div className="flex rounded-md border">
-            {DURATION_UNITS.map((unit) => (
+            {durationUnits.map((unit) => (
               <button
-                key={unit}
+                key={unit.value}
                 type="button"
-                onClick={() => onDurationUnitChange(unit)}
+                onClick={() => setStep({ ...step, durationUnit: unit.value })}
                 className={`px-3 py-2 text-sm transition-colors ${
-                  durationUnit === unit
+                  step?.durationUnit === unit.value
                     ? 'bg-primary text-primary-foreground'
                     : 'hover:bg-muted'
                 } first:rounded-l-md last:rounded-r-md`}
               >
-                {DURATION_UNIT_LABELS[unit]}
+                {unit.label}
               </button>
             ))}
           </div>
@@ -77,8 +62,8 @@ export function TimingStep({
         <Input
           id="step-assignee"
           placeholder="Who is responsible for this step? (optional)"
-          value={assignee}
-          onChange={(e) => onAssigneeChange(e.target.value)}
+          value={step?.assignee ?? ''}
+          onChange={(e) => setStep({ ...step, assignee: e.target.value })}
         />
         <FieldDescription>
           Person or team responsible for completing this step

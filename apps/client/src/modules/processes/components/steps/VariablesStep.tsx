@@ -4,11 +4,7 @@ import { Plus, Trash2, Variable, Package, Leaf } from 'lucide-react';
 
 import { Button } from '@/src/common/Button';
 import { Input } from '@/src/common/Input';
-import {
-  Field,
-  FieldDescription,
-  FieldLabel,
-} from '@/src/common/Field';
+import { Field, FieldDescription, FieldLabel } from '@/src/common/Field';
 import { Separator } from '@/src/common/Separator';
 import {
   OutputVariable,
@@ -22,15 +18,18 @@ import {
   METRIC_UNIT_LABELS,
   DUMMY_INGREDIENTS,
 } from '@/src/modules/ingredients/types';
+import { useStep } from '../../hooks/useStep';
 
 interface VariablesStepProps {
-  variables: OutputVariable[];
   products: Product[];
-  onVariablesChange: (variables: OutputVariable[]) => void;
 }
 
 const METRIC_UNITS: MetricUnit[] = ['lt', 'ml', 'kg', 'g', 'units', 'oz', 'lb'];
-const OUTPUT_VARIABLE_TYPES: OutputVariableType[] = ['name', 'product', 'ingredient'];
+const OUTPUT_VARIABLE_TYPES: OutputVariableType[] = [
+  'name',
+  'product',
+  'ingredient',
+];
 
 function getVariableIcon(type: OutputVariableType) {
   switch (type) {
@@ -43,11 +42,8 @@ function getVariableIcon(type: OutputVariableType) {
   }
 }
 
-export function VariablesStep({
-  variables,
-  products,
-  onVariablesChange,
-}: VariablesStepProps) {
+export function VariablesStep({ products }: VariablesStepProps) {
+  const { step, setStep } = useStep();
   const ingredients: Ingredient[] = DUMMY_INGREDIENTS;
 
   const handleAddVariable = () => {
@@ -57,16 +53,23 @@ export function VariablesStep({
       name: '',
       unit: 'units',
     };
-    onVariablesChange([...variables, newVariable]);
+    setStep({
+      ...step,
+      outputVariables: [...(step?.outputVariables || []), newVariable],
+    });
   };
 
   const handleRemoveVariable = (id: string) => {
-    onVariablesChange(variables.filter((v) => v.id !== id));
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).filter((v) => v.id !== id),
+    });
   };
 
   const handleTypeChange = (id: string, type: OutputVariableType) => {
-    onVariablesChange(
-      variables.map((v) =>
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).map((v) =>
         v.id === id
           ? {
               ...v,
@@ -78,26 +81,33 @@ export function VariablesStep({
               ingredient: undefined,
             }
           : v
-      )
-    );
+      ),
+    });
   };
 
   const handleNameChange = (id: string, name: string) => {
-    onVariablesChange(
-      variables.map((v) => (v.id === id ? { ...v, name } : v))
-    );
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).map((v) =>
+        v.id === id ? { ...v, name } : v
+      ),
+    });
   };
 
   const handleUnitChange = (id: string, unit: MetricUnit) => {
-    onVariablesChange(
-      variables.map((v) => (v.id === id ? { ...v, unit } : v))
-    );
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).map((v) =>
+        v.id === id ? { ...v, unit } : v
+      ),
+    });
   };
 
   const handleProductChange = (id: string, productId: string) => {
     const product = products.find((p) => p.id === productId);
-    onVariablesChange(
-      variables.map((v) =>
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).map((v) =>
         v.id === id
           ? {
               ...v,
@@ -105,14 +115,15 @@ export function VariablesStep({
               product: product || undefined,
             }
           : v
-      )
-    );
+      ),
+    });
   };
 
   const handleIngredientChange = (id: string, ingredientId: string) => {
     const ingredient = ingredients.find((i) => i.id === ingredientId);
-    onVariablesChange(
-      variables.map((v) =>
+    setStep({
+      ...step,
+      outputVariables: (step?.outputVariables || []).map((v) =>
         v.id === id
           ? {
               ...v,
@@ -121,8 +132,8 @@ export function VariablesStep({
               unit: ingredient?.metricUnit || v.unit,
             }
           : v
-      )
-    );
+      ),
+    });
   };
 
   const renderValueSelector = (variable: OutputVariable) => {
@@ -155,7 +166,9 @@ export function VariablesStep({
         return (
           <select
             value={variable.ingredientId || ''}
-            onChange={(e) => handleIngredientChange(variable.id, e.target.value)}
+            onChange={(e) =>
+              handleIngredientChange(variable.id, e.target.value)
+            }
             className="border-input bg-background h-9 flex-1 rounded-md border px-3 text-sm"
           >
             <option value="">Select an ingredient</option>
@@ -173,13 +186,14 @@ export function VariablesStep({
     <Field>
       <FieldLabel>Output Variables</FieldLabel>
       <FieldDescription>
-        Define the output values that will be recorded when this step is completed.
+        Define the output values that will be recorded when this step is
+        completed.
       </FieldDescription>
 
       <div className="mt-3 space-y-3">
-        {variables.length > 0 && (
+        {(step?.outputVariables?.length ?? 0) > 0 && (
           <div className="rounded-lg border">
-            {variables.map((variable, index) => {
+            {step?.outputVariables?.map((variable, index) => {
               const Icon = getVariableIcon(variable.type);
               return (
                 <div key={variable.id}>
@@ -193,7 +207,10 @@ export function VariablesStep({
                         <select
                           value={variable.type}
                           onChange={(e) =>
-                            handleTypeChange(variable.id, e.target.value as OutputVariableType)
+                            handleTypeChange(
+                              variable.id,
+                              e.target.value as OutputVariableType
+                            )
                           }
                           className="border-input bg-background h-9 w-32 rounded-md border px-3 text-sm"
                         >
@@ -207,10 +224,16 @@ export function VariablesStep({
                         <select
                           value={variable.unit}
                           onChange={(e) =>
-                            handleUnitChange(variable.id, e.target.value as MetricUnit)
+                            handleUnitChange(
+                              variable.id,
+                              e.target.value as MetricUnit
+                            )
                           }
                           className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-                          disabled={variable.type === 'ingredient' && !!variable.ingredient}
+                          disabled={
+                            variable.type === 'ingredient' &&
+                            !!variable.ingredient
+                          }
                         >
                           {METRIC_UNITS.map((unit) => (
                             <option key={unit} value={unit}>
@@ -247,12 +270,12 @@ export function VariablesStep({
           Add Output Variable
         </Button>
 
-        {variables.length === 0 && (
+        {(step?.outputVariables?.length ?? 0) === 0 ? (
           <p className="text-muted-foreground py-4 text-center text-sm">
             No output variables defined. Click the button above to add variables
             that will be recorded when this step completes.
           </p>
-        )}
+        ) : null}
       </div>
     </Field>
   );
