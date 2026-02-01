@@ -51,12 +51,12 @@ export function ProcessBasicInformation({
   }, [steps]);
 
   return (
-    <Card>
+    <Card className="h-fit w-full lg:w-[700px]">
       <CardHeader>
         <CardTitle>Basic Information</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="flex flex-col gap-6">
           <div className="space-y-4">
             <FieldGroup>
               <Field>

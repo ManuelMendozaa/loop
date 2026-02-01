@@ -3,18 +3,18 @@
 import { useState, useEffect } from 'react';
 
 import { Card, CardContent } from '@/src/common/Card';
-import { ProcessesTable } from '@/src/modules/processes/components/ProcessesTable';
+import { WorkflowsTable } from '@/src/modules/processes/components/WorkflowsTable';
 import { ProcessesHeader } from '@/src/modules/processes/components/ProcessesHeader';
-import { Process, DUMMY_PROCESSES } from '@/src/modules/processes/types';
+import { Workflow, DUMMY_WORKFLOWS } from '@/src/modules/processes/types/workflow';
 
-export default function ProcessesPage() {
-  const [processes, setProcesses] = useState<Process[]>([]);
+export default function WorkflowsPage() {
+  const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Simulate API loading with dummy data
     const timer = setTimeout(() => {
-      setProcesses(DUMMY_PROCESSES);
+      setWorkflows(DUMMY_WORKFLOWS);
       setIsLoading(false);
     }, 800);
 
@@ -27,7 +27,7 @@ export default function ProcessesPage() {
       <main className="flex-1 p-6">
         <Card>
           <CardContent className="p-0">
-            <ProcessesTable processes={processes} isLoading={isLoading} />
+            <WorkflowsTable workflows={workflows} isLoading={isLoading} />
           </CardContent>
         </Card>
       </main>

@@ -17,7 +17,7 @@ export function TypeStep() {
             onClick={() => {
               setStep((prev) => ({ ...prev, type: type.value }));
             }}
-            className={`rounded-lg border p-4 text-left transition-colors ${
+            className={`rounded-lg border p-4 text-left transition-all duration-150 active:scale-[0.97] ${
               step?.type === type.value
                 ? 'border-primary bg-primary/5'
                 : 'hover:border-primary/50 hover:bg-muted/50'

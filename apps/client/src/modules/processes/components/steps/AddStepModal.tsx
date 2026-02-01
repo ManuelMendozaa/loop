@@ -193,16 +193,20 @@ export function AddStepModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-5xl">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-5xl gap-0">
+        <DialogHeader className="-mx-6 border-b px-6 pb-4">
           <div className="mb-4">
-            <StepIndicator steps={MODAL_STEPS} currentStep={currentStep} />
+            <StepIndicator
+              steps={MODAL_STEPS}
+              currentStep={currentStep}
+              onStepClick={setCurrentStep}
+            />
           </div>
           <DialogTitle>{stepTitles[currentStep]}</DialogTitle>
           <DialogDescription>{stepDescriptions[currentStep]}</DialogDescription>
         </DialogHeader>
 
-        <div className="py-4">
+        <div className="h-[500px] overflow-y-auto py-4">
           {currentStep === 'type' ? <TypeStep /> : null}
           {currentStep === 'details' ? (
             <DetailsStep providers={providers} />
@@ -214,7 +218,7 @@ export function AddStepModal({
           {currentStep === 'review' ? <ReviewStep /> : null}
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="-mx-6 border-t px-6 pt-4">
           {!isFirstStep && (
             <Button
               variant="outline"

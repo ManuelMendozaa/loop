@@ -7,13 +7,21 @@ interface ProcessFormHeaderProps {
   isSaving: boolean;
   canSave: boolean;
   handleSave: () => void;
+  isEditMode?: boolean;
+  processName?: string;
 }
 
 export function ProcessFormHeader({
   isSaving,
   canSave,
   handleSave,
+  isEditMode = false,
+  processName,
 }: ProcessFormHeaderProps) {
+  const title = isEditMode ? processName || 'Editar Proceso' : 'Nuevo Proceso';
+  const saveLabel = isEditMode ? 'Guardar Cambios' : 'Guardar Proceso';
+  const savingLabel = 'Guardando...';
+
   return (
     <header className="flex h-14 items-center justify-between gap-4 border-b px-6">
       <div className="flex items-center gap-4">
@@ -21,16 +29,16 @@ export function ProcessFormHeader({
         <Button variant="ghost" size="sm" asChild>
           <Link href="/app/processes">
             <ArrowLeft />
-            Processes
+            Procesos
           </Link>
         </Button>
         <span className="text-muted-foreground">/</span>
-        <h1 className="text-lg font-semibold">New Process</h1>
+        <h1 className="text-lg font-semibold">{title}</h1>
       </div>
       <div className="flex items-center gap-2">
         <Button onClick={handleSave} disabled={isSaving || !canSave}>
           {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
-          {isSaving ? 'Saving...' : 'Save Process'}
+          {isSaving ? savingLabel : saveLabel}
         </Button>
       </div>
     </header>

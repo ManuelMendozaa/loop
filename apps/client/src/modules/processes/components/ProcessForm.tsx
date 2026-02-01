@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '@/src/common/Button';
 import { DUMMY_PROVIDERS } from '../../providers/types';
-import { ProcessStep, ProcessPriority } from '../types/process';
+import { ProcessStep, ProcessPriority, Process } from '../types/process';
 import { AddStepModal } from './steps/AddStepModal';
 import { ProcessStepCard } from './steps/ProcessStepCard';
 import { EmptySteps } from './steps/EmptySteps';
@@ -12,7 +12,12 @@ import { ProcessBasicInformation } from './form/ProcessBasicInformation';
 import { ProcessFormHeader } from './form/ProcessFormHeader';
 import { AddProcessStepContextProvider } from '../contexts/AddProcessStepContext';
 
-export function ProcessForm() {
+interface ProcessFormProps {
+  process?: Process;
+}
+
+export function ProcessForm({ process }: ProcessFormProps) {
+  const isEditMode = !!process;
   const providers = DUMMY_PROVIDERS; // TODO: Fetch from API
   const [isSaving, setIsSaving] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,12 +26,14 @@ export function ProcessForm() {
   );
 
   // Basic info state
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [priority, setPriority] = useState<ProcessPriority>('medium');
+  const [name, setName] = useState(process?.name ?? '');
+  const [description, setDescription] = useState(process?.description ?? '');
+  const [priority, setPriority] = useState<ProcessPriority>(
+    process?.priority ?? 'medium'
+  );
 
   // Steps state
-  const [steps, setSteps] = useState<ProcessStep[]>([]);
+  const [steps, setSteps] = useState<ProcessStep[]>(process?.steps ?? []);
 
   const selectedProviders = useMemo(() => {
     const providerIds = new Set<string>();
@@ -100,9 +107,11 @@ export function ProcessForm() {
         isSaving={isSaving}
         canSave={canSave}
         handleSave={handleSave}
+        isEditMode={isEditMode}
+        processName={name}
       />
 
-      <main className="flex-1 space-y-6 overflow-auto p-6">
+      <div className="overflow-auto p-6 flex flex-col lg:flex-row gap-6">
         <ProcessBasicInformation
           name={name}
           description={description}
@@ -115,47 +124,49 @@ export function ProcessForm() {
         />
 
         {/* Steps Section */}
-        <div>
+        <div className="flex-1">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-semibold">Process Steps</h2>
+              <h2 className="text-lg font-semibold">Pasos del Proceso</h2>
               <p className="text-muted-foreground text-sm">
-                Define the steps required to complete this process
+                Define los pasos necesarios para completar este proceso
               </p>
             </div>
             {steps.length > 0 && (
               <Button variant="outline" size="sm" onClick={handleOpenAddModal}>
                 <Plus />
-                Add Step
+                Agregar Paso
               </Button>
             )}
           </div>
 
-          {steps.length === 0 ? (
-            <EmptySteps onAddClick={handleOpenAddModal} />
-          ) : (
-            <div className="space-y-3">
-              {steps.map((step, index) => (
-                <ProcessStepCard
-                  key={step.id}
-                  step={step}
-                  stepNumber={index + 1}
-                  onEdit={handleOpenEditModal}
-                  onDelete={handleDeleteStep}
-                />
-              ))}
-              <button
-                type="button"
-                onClick={handleOpenAddModal}
-                className="border-muted hover:border-primary hover:bg-muted/50 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-4 text-sm transition-colors"
-              >
-                <Plus className="size-4" />
-                Add Another Step
-              </button>
-            </div>
-          )}
+          <div className="p-4 w-full bg-primary/10 rounded-xl">
+            {steps.length === 0 ? (
+              <EmptySteps onAddClick={handleOpenAddModal} />
+            ) : (
+              <div className="space-y-3">
+                {steps.map((step, index) => (
+                  <ProcessStepCard
+                    key={step.id}
+                    step={step}
+                    stepNumber={index + 1}
+                    onEdit={handleOpenEditModal}
+                    onDelete={handleDeleteStep}
+                  />
+                ))}
+                <button
+                  type="button"
+                  onClick={handleOpenAddModal}
+                  className="border-muted hover:border-primary hover:bg-muted/50 flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-4 text-sm transition-colors"
+                >
+                  <Plus className="size-4" />
+                  Agregar Otro Paso
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+      </div>
 
       <AddProcessStepContextProvider>
         <AddStepModal

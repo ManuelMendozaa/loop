@@ -62,8 +62,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <span className="text-lg font-semibold">Loop Admin</span>
           </div>
         </SidebarHeader>
-        <SidebarSeparator />
         <SidebarContent>
+          <SidebarSeparator />
           <SidebarGroup>
             <SidebarGroupLabel>Navigation</SidebarGroupLabel>
             <SidebarGroupContent>

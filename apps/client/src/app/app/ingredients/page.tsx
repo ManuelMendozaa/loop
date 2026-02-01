@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import { SidebarTrigger } from '@/src/common/Sidebar';
 import { Button } from '@/src/common/Button';
@@ -44,9 +45,11 @@ export default function IngredientsPage() {
           <SidebarTrigger />
           <h1 className="text-lg font-semibold">Ingredients</h1>
         </div>
-        <Button size="sm">
-          <Plus />
-          Add Ingredient
+        <Button size="sm" asChild>
+          <Link href="/app/ingredients/new">
+            <Plus />
+            Add Ingredient
+          </Link>
         </Button>
       </header>
       <main className="flex-1 p-6">
