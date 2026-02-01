@@ -26,6 +26,9 @@ export class Server {
     const fastify = Fastify();
 
     await fastify.register(fastifyAutoload, {
+      dir: path.join(__dirname, 'plugins/errors'),
+    });
+    await fastify.register(fastifyAutoload, {
       dir: path.join(__dirname, 'plugins/middlewares'),
     });
     await fastify.register(fastifyAutoload, {
