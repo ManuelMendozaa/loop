@@ -30,3 +30,5 @@ UI for @loop. Optimize for correctness + maintainability. Tests are the source o
 
 - Buttons activating async actions must disable and show the `Spinner` in them
 - Views requiring loading must implement `Skeleton`
+- Components located in ./src/app must only call other components in ./src/modules
+- Every file must only have the component and its prop definition
