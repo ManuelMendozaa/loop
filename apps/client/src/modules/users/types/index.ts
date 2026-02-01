@@ -1,11 +1,14 @@
 import { z } from 'zod';
+import { RoleSchema } from '@/src/modules/auth/types';
 
 export const UserSchema = z.object({
   id: z.string(),
   firstName: z.string(),
   lastName: z.string(),
   email: z.email(),
+  phone: z.string().optional(),
   status: z.enum(['active', 'inactive']),
+  roles: z.array(RoleSchema).optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
+import Link from 'next/link';
 
 import { SidebarTrigger } from '@/src/common/Sidebar';
 import { Button } from '@/src/common/Button';
@@ -111,9 +112,11 @@ export default function UsersPage() {
           <SidebarTrigger />
           <h1 className="text-lg font-semibold">Users</h1>
         </div>
-        <Button size="sm">
-          <Plus />
-          Add User
+        <Button size="sm" asChild>
+          <Link href="/app/users/new">
+            <Plus />
+            Add User
+          </Link>
         </Button>
       </header>
       <main className="flex-1 p-6">
