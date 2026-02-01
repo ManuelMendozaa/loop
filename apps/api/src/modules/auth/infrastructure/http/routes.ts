@@ -5,5 +5,5 @@ export function registerAuthRoutes(
   fastify: FastifyInstance,
   authController: AuthController
 ) {
-  fastify.post('/signIn', authController.signIn);
+  fastify.post('/sign-in', authController.signIn);
 }
