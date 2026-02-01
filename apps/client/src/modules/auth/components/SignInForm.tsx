@@ -37,6 +37,8 @@ export function SignInForm() {
       return;
     }
 
+    localStorage.setItem('token', response.data!.token);
+
     toast.success('Inicio de sesión exitoso');
     router.push('/app');
   };
