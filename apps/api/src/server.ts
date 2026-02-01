@@ -32,6 +32,9 @@ export class Server {
       dir: path.join(__dirname, 'plugins/middlewares'),
     });
     await fastify.register(fastifyAutoload, {
+      dir: path.join(__dirname, 'plugins/integrations'),
+    });
+    await fastify.register(fastifyAutoload, {
       dir: path.join(__dirname, 'plugins/routes'),
       prefix: '/api',
     });
