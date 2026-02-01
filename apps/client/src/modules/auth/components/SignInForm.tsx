@@ -12,18 +12,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/src/common/Card';
-import { Field, FieldError, FieldGroup, FieldLabel } from '@/src/common/Field';
+import { Field, FieldGroup, FieldLabel } from '@/src/common/Field';
 import { useSignIn } from '../services/useSignIn';
 
 export function SignInForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   const signInMutation = useSignIn();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -46,14 +45,14 @@ export function SignInForm() {
     <div className="bg-muted/40 flex min-h-screen items-center justify-center p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Sign In</CardTitle>
+          <CardTitle className="text-xl">Iniciar sesión</CardTitle>
           <CardDescription>
-            Enter your credentials to access the admin panel
+            Introduce tus credenciales para acceder al panel de administración
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <FieldGroup>
+            <FieldGroup className="gap-2">
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
@@ -67,7 +66,7 @@ export function SignInForm() {
                 />
               </Field>
               <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <FieldLabel htmlFor="password">Contraseña</FieldLabel>
                 <Input
                   id="password"
                   type="password"
@@ -78,14 +77,13 @@ export function SignInForm() {
                   autoComplete="current-password"
                 />
               </Field>
-              {error && <FieldError>{error}</FieldError>}
               <Button
                 type="submit"
                 className="w-full h-10"
                 disabled={isLoading}
               >
                 {isLoading ? <Loader2 className="animate-spin h-4" /> : null}
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}
               </Button>
             </FieldGroup>
           </form>
