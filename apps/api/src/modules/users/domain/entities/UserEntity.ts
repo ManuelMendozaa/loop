@@ -11,6 +11,7 @@ export class UserEntity {
   public firstName?: string;
   public lastName?: string;
   public email: string;
+  public slug?: string;
   public password?: string;
   public status: UserStatus;
   public profile?: ProfileEntity;
@@ -20,6 +21,7 @@ export class UserEntity {
     this.firstName = input.firstName;
     this.lastName = input.lastName;
     this.email = input.email;
+    this.slug = input.type === 'reconstitute' ? input.slug : undefined;
     this.password = input.password;
     this.status = UserStatus.fromValue(input.status);
 

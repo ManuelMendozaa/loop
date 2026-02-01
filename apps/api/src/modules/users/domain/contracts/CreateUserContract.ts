@@ -12,6 +12,7 @@ export interface ReconstituteUserContract {
   id: string;
   firstName: string;
   lastName: string;
+  slug: string;
   email: string;
   password: string;
   status: UserStatusEnum;

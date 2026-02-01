@@ -17,7 +17,7 @@ export class AuthController {
     }>,
     reply: FastifyReply
   ) {
-    const response = await this.authApplication.useCases.signUp.execute(
+    const response = await this.authApplication.useCases.signIn.execute(
       request.body
     );
     return reply.status(201).send(response);

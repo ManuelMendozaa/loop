@@ -3,5 +3,5 @@ export interface ExceptionThrower {
     code: string,
     params?: Record<string, any>,
     language?: 'es' | 'en'
-  ): void;
+  ): never;
 }

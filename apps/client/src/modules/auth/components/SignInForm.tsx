@@ -14,8 +14,10 @@ import {
 } from '@/src/common/Card';
 import { Field, FieldGroup, FieldLabel } from '@/src/common/Field';
 import { useSignIn } from '../services/useSignIn';
+import { useRouter } from 'next/navigation';
 
 export function SignInForm() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -28,17 +30,15 @@ export function SignInForm() {
 
     const response = await signInMutation.mutateAsync({ email, password });
 
-    console.log(response);
-
     if (!response.success) {
       const message = response.error ?? 'Sign in failed';
-      console.log(message);
       toast.error(message);
       setIsLoading(false);
       return;
     }
 
-    setIsLoading(false);
+    toast.success('Inicio de sesión exitoso');
+    router.push('/app');
   };
 
   return (

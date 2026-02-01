@@ -1,4 +1,5 @@
-export type UserStatusEnum = 'registering' | 'active' | 'suspended';
+export const userStatusValues = ['registering', 'active', 'suspended'] as const;
+export type UserStatusEnum = (typeof userStatusValues)[number];
 
 export class UserStatus {
   private value: UserStatusEnum;

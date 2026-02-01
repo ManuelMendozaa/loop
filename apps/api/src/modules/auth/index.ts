@@ -22,6 +22,7 @@ export default fp((fastify) => {
     getUserByEmail,
     registerUser,
     tokenHandler: TokenHandlerAdapter,
+    exceptionThrower: fastify.exceptionThrower,
   });
 
   const authController = new AuthController(authApplication);

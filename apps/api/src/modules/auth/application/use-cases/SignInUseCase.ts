@@ -3,28 +3,32 @@ import { GetUserByEmail } from '../ports/driven/GetUserByEmail';
 import { SignInContract } from '../ports/driving/SignIn';
 import { TokenHandler } from '../ports/driven/TokenHandler';
 import { SessionRepository } from '../ports/driven/SessionRepository';
+import { ExceptionThrower } from '@/shared/ExceptionThrower';
 
 export class SignInUseCase implements UseCase {
   private readonly getUserByEmail: GetUserByEmail;
   private readonly tokenHandler: TokenHandler;
   private readonly sessionRepository: SessionRepository;
+  private readonly exceptionThrower: ExceptionThrower;
 
   public constructor(
     getUserByEmail: GetUserByEmail,
     tokenHandler: TokenHandler,
-    sessionRepository: SessionRepository
+    sessionRepository: SessionRepository,
+    exceptionThrower: ExceptionThrower
   ) {
     this.getUserByEmail = getUserByEmail;
     this.tokenHandler = tokenHandler;
     this.sessionRepository = sessionRepository;
+    this.exceptionThrower = exceptionThrower;
   }
 
   async execute(input: SignInContract) {
     const user = await this.getUserByEmail.execute(input.email);
-    if (!user) throw new Error('Invalid credentials');
+    if (!user) this.exceptionThrower.throw('invalid-credentials');
 
     if (!user.password.equals(input.password)) {
-      throw new Error('Invalid credentials');
+      this.exceptionThrower.throw('invalid-credentials');
     }
 
     const tokens = this.tokenHandler.issueTokens(user.id);

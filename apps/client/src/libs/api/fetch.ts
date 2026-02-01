@@ -25,8 +25,10 @@ export const fetchWrapper = async <DataType>({
   try {
     const data = await response?.json();
     const parsedData = schema.parse(data);
-    console.log(parsedData);
-    if (response.status === 500) {
+
+    const isBadRequest = response.status.toString().startsWith('4');
+    const isInternalServerError = response.status.toString().startsWith('5');
+    if (isBadRequest || isInternalServerError) {
       return { success: false, response, error: data.error };
     }
     return { success: true, response, data: parsedData };
