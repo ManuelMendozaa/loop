@@ -13,18 +13,25 @@ export const fetchWrapper = async <DataType>({
   }
 
   const response = await fetch(url, { ...options });
-  if (response.status === 504) return { response, data: null };
+  if (response.status === 504) {
+    return { success: false, response, error: 'Gateway Timeout' };
+  }
 
   const contentType = response.headers.get('content-type') ?? '';
   if (!contentType.includes('application/json')) {
-    return { response, data: null };
+    return { success: true, response, data: null };
   }
 
   try {
     const data = await response?.json();
     const parsedData = schema.parse(data);
-    return { response, data: parsedData };
+    console.log(parsedData);
+    if (response.status === 500) {
+      return { success: false, response, error: data.error };
+    }
+    return { success: true, response, data: parsedData };
   } catch (error) {
-    throw new Error(`Invalid response structure: ${error}`);
+    console.log(error);
+    return { success: false, response, error: 'Error' };
   }
 };

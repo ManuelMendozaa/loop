@@ -12,10 +12,9 @@ export type FetchInput<DataType> = {
   options?: RequestInit;
 };
 
-export type FetchOutput<DataType> = {
-  response: Response;
-  data: DataType | null;
-};
+export type FetchOutput<DataType> =
+  | { success: true; response: Response; data: DataType | null }
+  | { success: false; response: Response; error: string };
 
 export type QueryOptions<InputType, OutputType> = UseQueryOptions<
   InputType,

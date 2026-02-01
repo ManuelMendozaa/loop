@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/src/common/Button';
 import { Input } from '@/src/common/Input';
+import { toast } from '@/src/common/Sonner';
 import {
   Card,
   CardContent,
@@ -24,17 +25,21 @@ export function SignInForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
     setIsLoading(true);
 
-    try {
-      const response = await signInMutation.mutateAsync({ email, password });
-      console.log('Signed in successfully:', response);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign in failed');
-    } finally {
+    const response = await signInMutation.mutateAsync({ email, password });
+
+    console.log(response);
+
+    if (!response.success) {
+      const message = response.error ?? 'Sign in failed';
+      console.log(message);
+      toast.error(message);
       setIsLoading(false);
+      return;
     }
+
+    setIsLoading(false);
   };
 
   return (
@@ -58,7 +63,7 @@ export function SignInForm() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  disabled={isLoading}
+                  readOnly={isLoading}
                   autoComplete="email"
                 />
               </Field>
@@ -76,8 +81,12 @@ export function SignInForm() {
                 />
               </Field>
               {error && <FieldError>{error}</FieldError>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading && <Loader2 className="animate-spin" />}
+              <Button
+                type="submit"
+                className="w-full h-10"
+                disabled={isLoading}
+              >
+                {isLoading ? <Loader2 className="animate-spin h-4" /> : null}
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
             </FieldGroup>
