@@ -9,6 +9,7 @@ import {
 } from '@/src/common/Field';
 import {
   DurationUnit,
+  ExecutionType,
   DURATION_UNIT_LABELS,
   DURATION_UNITS,
 } from '../../types/process';
@@ -17,6 +18,7 @@ interface TimingStepProps {
   duration: string;
   durationUnit: DurationUnit;
   assignee: string;
+  executionType: ExecutionType;
   onDurationChange: (value: string) => void;
   onDurationUnitChange: (value: DurationUnit) => void;
   onAssigneeChange: (value: string) => void;
@@ -26,14 +28,22 @@ export function TimingStep({
   duration,
   durationUnit,
   assignee,
+  executionType,
   onDurationChange,
   onDurationUnitChange,
   onAssigneeChange,
 }: TimingStepProps) {
+  const durationLabel =
+    executionType === 'batch' ? 'Total Duration' : 'Duration per Iteration';
+  const durationDescription =
+    executionType === 'batch'
+      ? 'Total time to complete the entire batch'
+      : 'Time required for each iteration cycle';
+
   return (
     <FieldGroup>
       <Field>
-        <FieldLabel>Estimated Duration</FieldLabel>
+        <FieldLabel>{durationLabel}</FieldLabel>
         <div className="flex gap-2">
           <Input
             type="number"
@@ -60,9 +70,7 @@ export function TimingStep({
             ))}
           </div>
         </div>
-        <FieldDescription>
-          How long should this step take to complete?
-        </FieldDescription>
+        <FieldDescription>{durationDescription}</FieldDescription>
       </Field>
       <Field>
         <FieldLabel htmlFor="step-assignee">Assignee</FieldLabel>

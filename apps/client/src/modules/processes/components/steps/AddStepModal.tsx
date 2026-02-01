@@ -16,6 +16,7 @@ import {
   ProcessStep,
   StepType,
   DurationUnit,
+  ExecutionType,
   MODAL_STEPS,
   ModalStep,
   OutputVariable,
@@ -36,26 +37,20 @@ interface AddStepModalProps {
   step?: ProcessStep;
 }
 
-const getStepTitles = (isEditing: boolean): Record<ModalStep, string> => ({
-  type: isEditing ? 'Change Step Type' : 'Select Step Type',
+const getStepTitles = (): Record<ModalStep, string> => ({
+  type: 'Select Step Type',
   details: 'Step Details',
   timing: 'Timing & Assignment',
   variables: 'Output Variables',
-  review: isEditing ? 'Review Changes' : 'Review & Confirm',
+  review: 'Review Changes',
 });
 
-const getStepDescriptions = (
-  isEditing: boolean
-): Record<ModalStep, string> => ({
-  type: isEditing
-    ? 'Change the type of this process step'
-    : 'Choose the type of process step you want to add',
+const getStepDescriptions = (): Record<ModalStep, string> => ({
+  type: 'Choose the type of process step you want to add',
   details: 'Provide details about this step',
   timing: 'Set estimated duration and assign responsibility',
   variables: 'Define the output values to be recorded when this step completes',
-  review: isEditing
-    ? 'Review the changes before saving'
-    : 'Review the step configuration before adding',
+  review: 'Review the changes before saving',
 });
 
 export function AddStepModal({
@@ -80,6 +75,7 @@ export function AddStepModal({
   const [ingredients, setIngredients] = useState<SelectedIngredient[]>([]);
   const [outputVariables, setOutputVariables] = useState<OutputVariable[]>([]);
   const [providerIds, setProviderIds] = useState<string[]>([]);
+  const [executionType, setExecutionType] = useState<ExecutionType>('batch');
 
   // Populate form when editing
   useEffect(() => {
@@ -95,11 +91,12 @@ export function AddStepModal({
       setIngredients(step.ingredients || []);
       setOutputVariables(step.outputVariables || []);
       setProviderIds(step.providerIds || []);
+      setExecutionType(step.executionType || 'batch');
     }
   }, [step, open]);
 
-  const stepTitles = getStepTitles(isEditing);
-  const stepDescriptions = getStepDescriptions(isEditing);
+  const stepTitles = getStepTitles();
+  const stepDescriptions = getStepDescriptions();
 
   const currentStepIndex = MODAL_STEPS.indexOf(currentStep);
   const isFirstStep = currentStepIndex === 0;
@@ -168,6 +165,7 @@ export function AddStepModal({
       ingredients: ingredients.length > 0 ? ingredients : undefined,
       outputVariables: validVariables.length > 0 ? validVariables : undefined,
       providerIds: providerIds.length > 0 ? providerIds : undefined,
+      executionType,
     });
 
     // Reset form
@@ -188,6 +186,7 @@ export function AddStepModal({
     setIngredients([]);
     setOutputVariables([]);
     setProviderIds([]);
+    setExecutionType('batch');
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -227,6 +226,8 @@ export function AddStepModal({
               notes={notes}
               ingredients={ingredients}
               providerIds={providerIds}
+              executionType={executionType}
+              onExecutionTypeChange={setExecutionType}
               onNameChange={setName}
               onDescriptionChange={setDescription}
               onNotesChange={setNotes}
@@ -239,6 +240,7 @@ export function AddStepModal({
               duration={duration}
               durationUnit={durationUnit}
               assignee={assignee}
+              executionType={executionType}
               onDurationChange={setDuration}
               onDurationUnitChange={setDurationUnit}
               onAssigneeChange={setAssignee}

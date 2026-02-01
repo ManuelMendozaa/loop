@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Plus, Trash2 } from 'lucide-react';
+import { Building2, Plus, Trash2, Layers, RefreshCw } from 'lucide-react';
 import { Input } from '@/src/common/Input';
 import { Textarea } from '@/src/common/textarea';
 import { Button } from '@/src/common/Button';
@@ -14,7 +14,11 @@ import {
 } from '@/src/common/Field';
 import { SelectedIngredient } from '@/src/modules/ingredients/types';
 import { DUMMY_PROVIDERS, Provider } from '@/src/modules/providers/types';
-import { StepType } from '../../types/process';
+import {
+  StepType,
+  ExecutionType,
+  EXECUTION_TYPE_LABELS,
+} from '../../types/process';
 import { IngredientSelector } from './components/IngredientSelector';
 
 interface DetailsStepProps {
@@ -22,29 +26,83 @@ interface DetailsStepProps {
   name: string;
   description: string;
   notes: string;
+  executionType: ExecutionType;
   ingredients: SelectedIngredient[];
   providerIds: string[];
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onNotesChange: (value: string) => void;
+  onExecutionTypeChange: (executionType: ExecutionType) => void;
   onIngredientsChange: (ingredients: SelectedIngredient[]) => void;
   onProvidersChange: (providerIds: string[]) => void;
+}
+
+function ExecutionTypeSelector({
+  value,
+  onChange,
+}: {
+  value: ExecutionType;
+  onChange: (value: ExecutionType) => void;
+}) {
+  return (
+    <Field>
+      <FieldLabel>Execution Type</FieldLabel>
+      <FieldDescription>
+        How this step processes items
+      </FieldDescription>
+      <div className="mt-2 flex gap-2">
+        <button
+          type="button"
+          onClick={() => onChange('batch')}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+            value === 'batch'
+              ? 'border-primary bg-primary text-primary-foreground'
+              : 'border-input bg-background hover:bg-muted'
+          }`}
+        >
+          <Layers className="size-4" />
+          {EXECUTION_TYPE_LABELS.batch}
+        </button>
+        <button
+          type="button"
+          onClick={() => onChange('continuous')}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-lg border px-4 py-3 text-sm font-medium transition-colors ${
+            value === 'continuous'
+              ? 'border-primary bg-primary text-primary-foreground'
+              : 'border-input bg-background hover:bg-muted'
+          }`}
+        >
+          <RefreshCw className="size-4" />
+          {EXECUTION_TYPE_LABELS.continuous}
+        </button>
+      </div>
+      <p className="text-muted-foreground mt-2 text-xs">
+        {value === 'batch'
+          ? 'Process all items together in a single run'
+          : 'Process items one at a time in a continuous flow'}
+      </p>
+    </Field>
+  );
 }
 
 function GeneralInfoFields({
   name,
   description,
   notes,
+  executionType,
   onNameChange,
   onDescriptionChange,
   onNotesChange,
+  onExecutionTypeChange,
 }: {
   name: string;
   description: string;
   notes: string;
+  executionType: ExecutionType;
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onNotesChange: (value: string) => void;
+  onExecutionTypeChange: (executionType: ExecutionType) => void;
 }) {
   return (
     <FieldGroup>
@@ -69,6 +127,10 @@ function GeneralInfoFields({
           Provide clear instructions for this step
         </FieldDescription>
       </Field>
+      <ExecutionTypeSelector
+        value={executionType}
+        onChange={onExecutionTypeChange}
+      />
       <Field>
         <FieldLabel htmlFor="step-notes">Additional Notes</FieldLabel>
         <Textarea
@@ -233,11 +295,13 @@ export function DetailsStep({
   name,
   description,
   notes,
+  executionType,
   ingredients,
   providerIds,
   onNameChange,
   onDescriptionChange,
   onNotesChange,
+  onExecutionTypeChange,
   onIngredientsChange,
   onProvidersChange,
 }: DetailsStepProps) {
@@ -254,9 +318,11 @@ export function DetailsStep({
             name={name}
             description={description}
             notes={notes}
+            executionType={executionType}
             onNameChange={onNameChange}
             onDescriptionChange={onDescriptionChange}
             onNotesChange={onNotesChange}
+            onExecutionTypeChange={onExecutionTypeChange}
           />
         </div>
         <div>
@@ -282,9 +348,11 @@ export function DetailsStep({
       name={name}
       description={description}
       notes={notes}
+      executionType={executionType}
       onNameChange={onNameChange}
       onDescriptionChange={onDescriptionChange}
       onNotesChange={onNotesChange}
+      onExecutionTypeChange={onExecutionTypeChange}
     />
   );
 }

@@ -15,6 +15,8 @@ export const OutputVariableSchema = z.object({
   ingredient: IngredientSchema.optional(),
 });
 
+export const ExecutionTypeSchema = z.enum(['batch', 'continuous']);
+
 export const ProcessStepSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -27,6 +29,7 @@ export const ProcessStepSchema = z.object({
     'shipping',
     'custom',
   ]),
+  executionType: ExecutionTypeSchema,
   estimatedDuration: z.number().optional(),
   durationUnit: z.enum(['minutes', 'hours', 'days']).optional(),
   assignee: z.string().optional(),
@@ -56,6 +59,7 @@ export type ProcessStep = z.infer<typeof ProcessStepSchema>;
 export type Process = z.infer<typeof ProcessSchema>;
 export type ProcessPriority = z.infer<typeof ProcessPrioritySchema>;
 export type ProcessStatus = z.infer<typeof ProcessStatusSchema>;
+export type ExecutionType = z.infer<typeof ExecutionTypeSchema>;
 export type OutputVariable = z.infer<typeof OutputVariableSchema>;
 export type OutputVariableType = z.infer<typeof OutputVariableTypeSchema>;
 export type ModalStep = 'type' | 'details' | 'timing' | 'variables' | 'review';
@@ -140,3 +144,10 @@ export const PROCESS_STATUS_LABELS: Record<ProcessStatus, string> = {
 
 export const PROCESS_PRIORITIES: ProcessPriority[] = ['low', 'medium', 'high', 'urgent'];
 export const PROCESS_STATUSES: ProcessStatus[] = ['draft', 'active', 'completed'];
+
+export const EXECUTION_TYPE_LABELS: Record<ExecutionType, string> = {
+  batch: 'Batch',
+  continuous: 'Continuous',
+};
+
+export const EXECUTION_TYPES: ExecutionType[] = ['batch', 'continuous'];
