@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { Button } from '@/src/common/Button';
@@ -32,26 +32,40 @@ import { DUMMY_PRODUCTS } from '@/src/modules/products/utils/dummy';
 interface AddStepModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onAdd: (step: Omit<ProcessStep, 'id' | 'order'>) => void;
+  onSubmit: (step: Omit<ProcessStep, 'id' | 'order'>) => void;
+  step?: ProcessStep;
 }
 
-const STEP_TITLES: Record<ModalStep, string> = {
-  type: 'Select Step Type',
+const getStepTitles = (isEditing: boolean): Record<ModalStep, string> => ({
+  type: isEditing ? 'Change Step Type' : 'Select Step Type',
   details: 'Step Details',
   timing: 'Timing & Assignment',
   variables: 'Output Variables',
-  review: 'Review & Confirm',
-};
+  review: isEditing ? 'Review Changes' : 'Review & Confirm',
+});
 
-const STEP_DESCRIPTIONS: Record<ModalStep, string> = {
-  type: 'Choose the type of process step you want to add',
+const getStepDescriptions = (
+  isEditing: boolean
+): Record<ModalStep, string> => ({
+  type: isEditing
+    ? 'Change the type of this process step'
+    : 'Choose the type of process step you want to add',
   details: 'Provide details about this step',
   timing: 'Set estimated duration and assign responsibility',
   variables: 'Define the output values to be recorded when this step completes',
-  review: 'Review the step configuration before adding',
-};
+  review: isEditing
+    ? 'Review the changes before saving'
+    : 'Review the step configuration before adding',
+});
 
-function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
+export function AddStepModal({
+  open,
+  onOpenChange,
+  onSubmit,
+  step,
+}: AddStepModalProps) {
+  const isEditing = !!step;
+
   const [currentStep, setCurrentStep] = useState<ModalStep>('type');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -65,6 +79,27 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
   const [assignee, setAssignee] = useState('');
   const [ingredients, setIngredients] = useState<SelectedIngredient[]>([]);
   const [outputVariables, setOutputVariables] = useState<OutputVariable[]>([]);
+  const [providerIds, setProviderIds] = useState<string[]>([]);
+
+  // Populate form when editing
+  useEffect(() => {
+    if (step && open) {
+      // eslint-disable-next-line
+      setType(step.type);
+      setName(step.name);
+      setDescription(step.description);
+      setNotes(step.notes || '');
+      setDuration(step.estimatedDuration?.toString() || '');
+      setDurationUnit(step.durationUnit || 'hours');
+      setAssignee(step.assignee || '');
+      setIngredients(step.ingredients || []);
+      setOutputVariables(step.outputVariables || []);
+      setProviderIds(step.providerIds || []);
+    }
+  }, [step, open]);
+
+  const stepTitles = getStepTitles(isEditing);
+  const stepDescriptions = getStepDescriptions(isEditing);
 
   const currentStepIndex = MODAL_STEPS.indexOf(currentStep);
   const isFirstStep = currentStepIndex === 0;
@@ -103,6 +138,15 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
     }
   };
 
+  const filterValidVariables = (variables: OutputVariable[]) => {
+    return variables.filter((v) => {
+      if (v.type === 'name') return v.name?.trim();
+      if (v.type === 'product') return v.productId;
+      if (v.type === 'ingredient') return v.ingredientId;
+      return false;
+    });
+  };
+
   const handleSubmit = async () => {
     if (!type) return;
 
@@ -111,7 +155,9 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
     // Simulate API delay
     await new Promise((resolve) => setTimeout(resolve, 500));
 
-    onAdd({
+    const validVariables = filterValidVariables(outputVariables);
+
+    onSubmit({
       type,
       name,
       description,
@@ -120,10 +166,8 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
       durationUnit: duration ? durationUnit : undefined,
       assignee: assignee || undefined,
       ingredients: ingredients.length > 0 ? ingredients : undefined,
-      outputVariables:
-        outputVariables.filter((v) => v.name.trim()).length > 0
-          ? outputVariables.filter((v) => v.name.trim())
-          : undefined,
+      outputVariables: validVariables.length > 0 ? validVariables : undefined,
+      providerIds: providerIds.length > 0 ? providerIds : undefined,
     });
 
     // Reset form
@@ -143,6 +187,7 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
     setAssignee('');
     setIngredients([]);
     setOutputVariables([]);
+    setProviderIds([]);
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -152,19 +197,22 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
     onOpenChange(newOpen);
   };
 
-  const isWideModal = currentStep === 'details' && type === 'preparation';
+  const getSubmitButtonText = () => {
+    if (isSubmitting) {
+      return isEditing ? 'Saving...' : 'Adding...';
+    }
+    return isEditing ? 'Save Changes' : 'Add Step';
+  };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className={isWideModal ? 'sm:max-w-4xl' : 'sm:max-w-xl'}>
+      <DialogContent className="sm:max-w-5xl">
         <DialogHeader>
           <div className="mb-4">
             <StepIndicator steps={MODAL_STEPS} currentStep={currentStep} />
           </div>
-          <DialogTitle>{STEP_TITLES[currentStep]}</DialogTitle>
-          <DialogDescription>
-            {STEP_DESCRIPTIONS[currentStep]}
-          </DialogDescription>
+          <DialogTitle>{stepTitles[currentStep]}</DialogTitle>
+          <DialogDescription>{stepDescriptions[currentStep]}</DialogDescription>
         </DialogHeader>
 
         <div className="py-4">
@@ -178,10 +226,12 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
               description={description}
               notes={notes}
               ingredients={ingredients}
+              providerIds={providerIds}
               onNameChange={setName}
               onDescriptionChange={setDescription}
               onNotesChange={setNotes}
               onIngredientsChange={setIngredients}
+              onProvidersChange={setProviderIds}
             />
           )}
           {currentStep === 'timing' && (
@@ -228,13 +278,10 @@ function AddStepModal({ open, onOpenChange, onAdd }: AddStepModalProps) {
           )}
           <Button onClick={handleNext} disabled={!canProceed() || isSubmitting}>
             {isSubmitting && <Loader2 className="animate-spin" />}
-            {isLastStep ? (isSubmitting ? 'Adding...' : 'Add Step') : 'Next'}
+            {isLastStep ? getSubmitButtonText() : 'Next'}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
-
-export { AddStepModal };
-export type { AddStepModalProps };

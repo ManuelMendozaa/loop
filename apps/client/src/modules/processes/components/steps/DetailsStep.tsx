@@ -1,7 +1,11 @@
 'use client';
 
+import { useState } from 'react';
+import { Building2, Plus, Trash2 } from 'lucide-react';
 import { Input } from '@/src/common/Input';
 import { Textarea } from '@/src/common/textarea';
+import { Button } from '@/src/common/Button';
+import { Separator } from '@/src/common/Separator';
 import {
   Field,
   FieldDescription,
@@ -9,6 +13,7 @@ import {
   FieldLabel,
 } from '@/src/common/Field';
 import { SelectedIngredient } from '@/src/modules/ingredients/types';
+import { DUMMY_PROVIDERS, Provider } from '@/src/modules/providers/types';
 import { StepType } from '../../types/process';
 import { IngredientSelector } from './components/IngredientSelector';
 
@@ -18,10 +23,12 @@ interface DetailsStepProps {
   description: string;
   notes: string;
   ingredients: SelectedIngredient[];
+  providerIds: string[];
   onNameChange: (value: string) => void;
   onDescriptionChange: (value: string) => void;
   onNotesChange: (value: string) => void;
   onIngredientsChange: (ingredients: SelectedIngredient[]) => void;
+  onProvidersChange: (providerIds: string[]) => void;
 }
 
 function GeneralInfoFields({
@@ -75,20 +82,170 @@ function GeneralInfoFields({
   );
 }
 
+function ProviderSelector({
+  providerIds,
+  onProvidersChange,
+}: {
+  providerIds: string[];
+  onProvidersChange: (providerIds: string[]) => void;
+}) {
+  const [isAdding, setIsAdding] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const allProviders = DUMMY_PROVIDERS;
+  const selectedProviders = providerIds
+    .map((id) => allProviders.find((p) => p.id === id))
+    .filter((p): p is Provider => p !== undefined);
+
+  const availableProviders = allProviders.filter(
+    (p) => !providerIds.includes(p.id)
+  );
+
+  const filteredProviders = availableProviders.filter((p) =>
+    p.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleAddProvider = (provider: Provider) => {
+    onProvidersChange([...providerIds, provider.id]);
+    setSearchQuery('');
+    setIsAdding(false);
+  };
+
+  const handleRemoveProvider = (providerId: string) => {
+    onProvidersChange(providerIds.filter((id) => id !== providerId));
+  };
+
+  return (
+    <Field>
+      <FieldLabel>Providers</FieldLabel>
+      <FieldDescription>
+        Select providers responsible for this production step
+      </FieldDescription>
+
+      <div className="mt-2 space-y-2">
+        {selectedProviders.length > 0 && (
+          <div className="rounded-lg border">
+            {selectedProviders.map((provider, index) => (
+              <div key={provider.id}>
+                {index > 0 && <Separator />}
+                <div className="flex items-center gap-3 p-3">
+                  <div className="bg-muted flex size-8 shrink-0 items-center justify-center rounded-md">
+                    <Building2 className="text-muted-foreground size-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {provider.name}
+                    </p>
+                    <p className="text-muted-foreground text-xs">
+                      {provider.type} · {provider.city}
+                    </p>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() => handleRemoveProvider(provider.id)}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {isAdding ? (
+          <div className="rounded-lg border p-3">
+            <Input
+              type="text"
+              placeholder="Search providers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              autoFocus
+            />
+            <div className="mt-2 max-h-48 overflow-y-auto">
+              {filteredProviders.length === 0 ? (
+                <p className="text-muted-foreground py-4 text-center text-sm">
+                  {availableProviders.length === 0
+                    ? 'All providers have been added'
+                    : 'No providers found'}
+                </p>
+              ) : (
+                <div className="space-y-1">
+                  {filteredProviders.map((provider) => (
+                    <button
+                      key={provider.id}
+                      type="button"
+                      onClick={() => handleAddProvider(provider)}
+                      className="hover:bg-muted flex w-full items-center gap-3 rounded-md p-2 text-left transition-colors"
+                    >
+                      <div className="bg-muted flex size-8 shrink-0 items-center justify-center rounded-md">
+                        <Building2 className="text-muted-foreground size-4" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {provider.name}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          {provider.type} · {provider.city}
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="mt-2 flex justify-end">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setIsAdding(false);
+                  setSearchQuery('');
+                }}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setIsAdding(true)}
+            className="w-full"
+            disabled={availableProviders.length === 0}
+          >
+            <Plus className="size-4" />
+            Add Provider
+          </Button>
+        )}
+      </div>
+    </Field>
+  );
+}
+
 export function DetailsStep({
   stepType,
   name,
   description,
   notes,
   ingredients,
+  providerIds,
   onNameChange,
   onDescriptionChange,
   onNotesChange,
   onIngredientsChange,
+  onProvidersChange,
 }: DetailsStepProps) {
   const isPreparation = stepType === 'preparation';
+  const isProduction = stepType === 'production';
+  const hasRightPanel = isPreparation || isProduction;
 
-  if (isPreparation) {
+  if (hasRightPanel) {
     return (
       <div className="grid grid-cols-2 gap-6">
         <div>
@@ -103,10 +260,18 @@ export function DetailsStep({
           />
         </div>
         <div>
-          <IngredientSelector
-            selectedIngredients={ingredients}
-            onIngredientsChange={onIngredientsChange}
-          />
+          {isPreparation && (
+            <IngredientSelector
+              selectedIngredients={ingredients}
+              onIngredientsChange={onIngredientsChange}
+            />
+          )}
+          {isProduction && (
+            <ProviderSelector
+              providerIds={providerIds}
+              onProvidersChange={onProvidersChange}
+            />
+          )}
         </div>
       </div>
     );

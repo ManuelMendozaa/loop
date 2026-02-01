@@ -53,14 +53,6 @@ function IngredientSelector({
     );
   };
 
-  const handleAmountChange = (ingredientId: string, amount: number) => {
-    onIngredientsChange(
-      selectedIngredients.map((sel) =>
-        sel.ingredientId === ingredientId ? { ...sel, amount } : sel
-      )
-    );
-  };
-
   return (
     <Field>
       <FieldLabel>Ingredients</FieldLabel>
@@ -91,39 +83,17 @@ function IngredientSelector({
                       }
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="number"
-                      min="0.01"
-                      step="0.01"
-                      value={selected.amount}
-                      onChange={(e) =>
-                        handleAmountChange(
-                          selected.ingredientId,
-                          parseFloat(e.target.value) || 0
-                        )
-                      }
-                      className="h-8 w-20 text-right"
-                    />
-                    <span className="text-muted-foreground w-10 text-sm">
-                      {
-                        METRIC_UNIT_ABBREVIATIONS[
-                          selected.ingredient.metricUnit
-                        ]
-                      }
-                    </span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      onClick={() =>
-                        handleRemoveIngredient(selected.ingredientId)
-                      }
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="size-4" />
-                    </Button>
-                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    onClick={() =>
+                      handleRemoveIngredient(selected.ingredientId)
+                    }
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
                 </div>
               </div>
             ))}
