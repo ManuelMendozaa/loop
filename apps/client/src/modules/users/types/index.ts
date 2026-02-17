@@ -8,10 +8,16 @@ export const UserSchema = z.object({
   email: z.email(),
   phone: z.string().optional(),
   status: z.enum(['active', 'inactive']),
-  roles: z.array(RoleSchema).optional(),
+  role: RoleSchema.optional(),
+  inviteToken: z.string().optional(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
+
+export const USER_STATUS_LABELS: Record<'active' | 'inactive', string> = {
+  active: 'Activo',
+  inactive: 'Inactivo',
+};
 
 export const UserListSchema = z.array(UserSchema);
 
