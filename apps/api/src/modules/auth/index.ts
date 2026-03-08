@@ -21,8 +21,7 @@ export default fp((fastify) => {
     sessionRepository,
     getUserByEmail,
     registerUser,
-    tokenHandler: TokenHandlerAdapter,
-    exceptionThrower: fastify.exceptionThrower,
+    tokenHandler: TokenHandlerAdapter
   });
 
   const authController = new AuthController(authApplication);

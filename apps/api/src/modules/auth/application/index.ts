@@ -4,7 +4,6 @@ import { RegisterUser } from './ports/driven/RegisterUser';
 import { SignUpUseCase } from './use-cases/SignUpUseCase';
 import { SignInUseCase } from './use-cases/SignInUseCase';
 import { TokenHandler } from './ports/driven/TokenHandler';
-import { ExceptionThrower } from '@/shared/ExceptionThrower';
 
 interface UseCases {
   signUp: SignUpUseCase;
@@ -16,7 +15,6 @@ interface Adapters {
   getUserByEmail: GetUserByEmail;
   tokenHandler: TokenHandler;
   sessionRepository: SessionRepository;
-  exceptionThrower: ExceptionThrower;
 }
 
 export class AuthApplication {
@@ -28,14 +26,12 @@ export class AuthApplication {
         adapters.getUserByEmail,
         adapters.registerUser,
         adapters.tokenHandler,
-        adapters.sessionRepository,
-        adapters.exceptionThrower
+        adapters.sessionRepository
       ),
       signIn: new SignInUseCase(
         adapters.getUserByEmail,
         adapters.tokenHandler,
-        adapters.sessionRepository,
-        adapters.exceptionThrower
+        adapters.sessionRepository
       ),
     };
   }

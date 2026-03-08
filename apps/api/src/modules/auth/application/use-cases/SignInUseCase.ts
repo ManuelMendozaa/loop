@@ -1,34 +1,31 @@
 import { UseCase } from '@/shared/UseCase';
+import { InvalidCredentialsError } from '../../domain/errors/InvalidCredentialsError';
 import { GetUserByEmail } from '../ports/driven/GetUserByEmail';
 import { SignInContract } from '../ports/driving/SignIn';
 import { TokenHandler } from '../ports/driven/TokenHandler';
 import { SessionRepository } from '../ports/driven/SessionRepository';
-import { ExceptionThrower } from '@/shared/ExceptionThrower';
 
 export class SignInUseCase implements UseCase {
   private readonly getUserByEmail: GetUserByEmail;
   private readonly tokenHandler: TokenHandler;
   private readonly sessionRepository: SessionRepository;
-  private readonly exceptionThrower: ExceptionThrower;
 
   public constructor(
     getUserByEmail: GetUserByEmail,
     tokenHandler: TokenHandler,
     sessionRepository: SessionRepository,
-    exceptionThrower: ExceptionThrower
   ) {
     this.getUserByEmail = getUserByEmail;
     this.tokenHandler = tokenHandler;
     this.sessionRepository = sessionRepository;
-    this.exceptionThrower = exceptionThrower;
   }
 
   async execute(input: SignInContract) {
     const user = await this.getUserByEmail.execute(input.email);
-    if (!user) this.exceptionThrower.throw('invalid-credentials');
+    if (!user) throw new InvalidCredentialsError();
 
     if (!user.password.equals(input.password)) {
-      this.exceptionThrower.throw('invalid-credentials');
+      throw new InvalidCredentialsError();
     }
 
     const tokens = this.tokenHandler.issueTokens(user.id);
