@@ -9,6 +9,10 @@ API for @loop. Optimize for correctness + maintainability. Tests are the source 
 - Stack: TypeScript, Node >=20, Fastify
 - Architecture: DDD modules + Hexagonal
   - domain: `./src/modules/**/domain` (pure logic, no IO/framework)
+    - entities: `.../domain/entities`
+    - errors: `.../domain/errors` (each error defined on its own file)
+    - value-objects: `.../domain/value-objects`
+    - events: `.../domain/events`
   - application: `./src/modules/**/application` (use-cases)
     - ports/driven: `.../application/ports/driven`
     - ports/driving: `.../application/ports/driving`
