@@ -29,7 +29,8 @@ export const fetchWrapper = async <DataType>({
     const isBadRequest = response.status.toString().startsWith('4');
     const isInternalServerError = response.status.toString().startsWith('5');
     if (isBadRequest || isInternalServerError) {
-      return { success: false, response, error: data.error };
+      console.log(data);
+      return { success: false, response, error: data.message };
     }
     return { success: true, response, data: parsedData };
   } catch (error) {

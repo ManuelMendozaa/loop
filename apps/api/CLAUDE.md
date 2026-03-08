@@ -17,7 +17,8 @@ API for @loop. Optimize for correctness + maintainability. Tests are the source 
     - ports/driven: `.../application/ports/driven`
     - ports/driving: `.../application/ports/driving`
   - infrastructure: `./src/**/infrastructure` (DB/JWT/external/web)
-    - http: `./src/modules/**/infrastructure/http` (routes/controllers + DTO/mappers)
+    - errors: `.../infrastructure/errors` (handlers)
+    - http: `...//infrastructure/http` (routes/controllers + DTO/mappers)
 - Tests: `./src/test` mirrors `./src/modules` (unit/integration/e2e)
 
 ## Rules (non-negotiable)

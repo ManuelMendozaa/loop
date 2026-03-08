@@ -31,6 +31,7 @@ export function SignInForm() {
     const response = await signInMutation.mutateAsync({ email, password });
 
     if (!response.success) {
+      console.log(response);
       const message = response.error ?? 'Sign in failed';
       toast.error(message);
       setIsLoading(false);
