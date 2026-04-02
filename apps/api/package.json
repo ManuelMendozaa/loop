@@ -12,19 +12,20 @@
     "@fastify/helmet": "13.0.2",
     "@fastify/rate-limit": "10.3.0",
     "@fastify/websocket": "11.2.0",
+    "argon2": "0.44.0",
     "dotenv": "17.2.3",
-    "fastify": "5.7.2",
+    "fastify": "5.8.4",
     "fastify-plugin": "5.1.0",
-    "mongoose": "^9.1.5",
-    "zod": "^4.3.6"
+    "mongoose": "9.3.3",
+    "zod": "4.3.6"
   },
   "devDependencies": {
-    "@jest/globals": "^30.2.0",
-    "@types/jest": "^30.0.0",
+    "@jest/globals": "30.2.0",
+    "@types/jest": "30.0.0",
     "@types/node": "25.1.0",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.4.6",
-    "tsx": "^4.21.0",
+    "jest": "30.2.0",
+    "ts-jest": "29.4.6",
+    "tsx": "4.21.0",
     "typescript": "5.9.3"
   }
 }

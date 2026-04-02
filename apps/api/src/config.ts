@@ -7,6 +7,11 @@ const envSchema = z.object({
   SERVER_HOST: z.string().default('0.0.0.0'),
   CORS_ORIGINS: z.string().default('["*"]'),
   NODE_ENV: z.enum(['development', 'production', 'test']),
+  // Invitation module
+  INVITATION_ALLOWED_INVITER_EMAIL: z.string().email().optional(),
+  INVITATION_EXPIRATION_HOURS: z.string().default('72').transform(Number),
+  INVITATION_SIGNUP_SESSION_EXPIRATION_MINUTES: z.string().default('30').transform(Number),
+  INVITATION_BASE_URL: z.string().url().optional(),
 });
 type Environment = z.infer<typeof envSchema>;
 
